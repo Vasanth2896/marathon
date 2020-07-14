@@ -1,0 +1,40 @@
+$commonBorderRadius: 5px;
+$commonBorderColor: #d4d5d6;
+
+.FormFooterContainer {
+  height: 80px;
+  width: 80%;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  box-shadow: 0px -4px 5px -5px;
+  position: sticky;
+  z-index: 2;
+  bottom: 0px;
+  background: white;
+
+  button {
+    height: 40px;
+    width: 100px;
+    border: unset;
+    background-color: $commonBorderColor;
+    border-radius: $commonBorderRadius;
+    outline: none;
+    cursor: pointer;
+  }
+}
+
+.FormFooterButtonContainer {
+  margin-right: 145px;
+  height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 230px;
+}
+
+#saveButton {
+  color: white;
+  background: blue;
+}

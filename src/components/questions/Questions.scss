@@ -1,0 +1,58 @@
+$commonBorderRadius: 5px;
+$commonBorderColor: #d4d5d6;
+
+.questionContainer {
+  box-sizing: border-box;
+  height: auto;
+  margin: 0px auto 0px auto;
+  width: 65em;
+  padding: 30px;
+  border-radius: $commonBorderRadius;
+  background-color: #80808026;
+
+  input {
+    height: 30px;
+    border: unset;
+    padding: 10px;
+    background-color: #d4d5d6;
+    border-top-right-radius: $commonBorderRadius;
+    border-top-left-radius: $commonBorderRadius;
+    outline: none;
+    resize: none;
+    border-bottom: 2px solid black;
+  }
+
+  button {
+    height: 30px;
+    width: 70px;
+    border: unset;
+    background-color: #ececec;
+    border-radius: $commonBorderRadius;
+    outline: none;
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+}
+
+.questionAndAnswer {
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin-bottom: 30px;
+
+  div > input {
+    width: 98%;
+  }
+}
+
+.questionBtnContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-bottom: 30px;
+}
+
+#addBtn {
+  color: blue;
+}

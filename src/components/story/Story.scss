@@ -1,0 +1,99 @@
+$commonBorderRadius: 5px;
+$commonBorderColor: #d4d5d6;
+
+.storyContainer {
+  box-sizing: border-box;
+  height: 520px;
+  margin: 0px auto 0px auto;
+  width: 65em;
+  padding: 30px;
+  border-radius: $commonBorderRadius;
+  background-color: #80808026;
+  margin-bottom: 30px;
+
+  input {
+    height: 30px;
+  }
+
+  input[type="text"],
+  textarea {
+    border: unset;
+    padding: 10px;
+    background-color: #d4d5d6;
+    border-top-right-radius: $commonBorderRadius;
+    border-top-left-radius: $commonBorderRadius;
+    outline: none;
+    resize: none;
+    border-bottom: 2px solid black;
+  }
+
+  button {
+    border: unset;
+    background-color: $commonBorderColor;
+    border-radius: $commonBorderRadius;
+    outline: none;
+    cursor: pointer;
+  }
+
+  div {
+    margin-bottom: 30px;
+  }
+}
+.storyNameContainer {
+  width: 60%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.storyName {
+  width: 250px;
+}
+
+.updateImageBtn {
+  height: 45px;
+  width: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.storyContent {
+  width: 97%;
+  height: 180px;
+}
+
+.keywordContent {
+  width: 97%;
+  height: 30px;
+}
+
+.chipItem {
+  background-color: #d4d5d6;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 30px;
+  height: 30px;
+  padding: 0 4px 0 1rem;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.3rem 0.3rem 0;
+}
+
+.chipItem > .keywordButton {
+  background-color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  font: inherit;
+  margin-left: 10px;
+  font-weight: bold;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
