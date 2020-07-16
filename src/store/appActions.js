@@ -68,73 +68,66 @@ export function errorValidation() {
 export function addImage(image) {
     return (dispatch, getState) => {
         const { story } = getState().appReducer;
-        let newStory = JSON.parse(JSON.stringify(story));
-        newStory.bannerImage = image;
+        const newStory = JSON.parse(JSON.stringify(story));
+        Object.assign(newStory, { bannerImage: image })
         dispatch(app_onChange('story', newStory));
     }
 }
 
-export function addWord() {
+export function addWord(newKeyword) {
     return (dispatch, getState) => {
-        const { story, storyError } = getState().appReducer;
-        let newStory = JSON.parse(JSON.stringify(story));
-        let { keywordList, keyword } = newStory;
-        keywordList.push(keyword);
-        newStory.keyword = '';
-        let newStoryError = { ...storyError };
-        newStoryError.keywordListError = '';
-        dispatch(app_onChange('storyError', newStoryError));
-        dispatch(app_onChange('story', newStory));
+        console.log(newKeyword.split(''));
+        let { story, storyError } = getState().appReducer;
+        let { keywordList } = story;
+        let newKeywordList = [...keywordList];
+        newKeywordList.push(newKeyword)
+        Object.assign(story, { keywordList: newKeywordList, keyword: '' });
+        Object.assign(storyError, { keywordListError: '' });
+        dispatch(app_onChange('story', story));
+        dispatch(app_onChange('storyError', storyError));
+
     }
 }
 
 export function deleteWord(existingWordList) {
     return (dispatch, getState) => {
-        const { story } = getState().appReducer;
-        let newStory = JSON.parse(JSON.stringify(story));
-        newStory.keywordList = existingWordList;
-        dispatch(app_onChange('story', newStory));
+        let { story } = getState().appReducer;
+        Object.assign(story, { keywordList: [...existingWordList] });
+        dispatch(app_onChange('story', story));
     }
 }
 
 export function questionListManipulation(newQuestionsList) {
     return (dispatch, getState) => {
         const { questionSet, questionSetError } = getState().appReducer;
-        let newQuestionSet = JSON.parse(JSON.stringify(questionSet));
-        newQuestionSet.questionsList = newQuestionsList;
-        newQuestionSet.question = '';
-        newQuestionSet.answer = '';
-        let newQuestionSetError = JSON.parse(JSON.stringify(questionSetError));
-        newQuestionSetError.questionsListError = ''
-        dispatch(app_onChange('questionSetError', newQuestionSetError));
-        dispatch(app_onChange('questionSet', newQuestionSet));
+        Object.assign(questionSet, { questionsList: [...newQuestionsList], question: '', answer: '' });
+        Object.assign(questionSetError, { questionsListError: '' });
+        dispatch(app_onChange('questionSetError', questionSetError));
+        dispatch(app_onChange('questionSet', questionSet));
     }
 }
 
 export function onQuestionCancel() {
     return (dispatch, getState) => {
         const { questionSet } = getState().appReducer;
-        let newQuestionSet = JSON.parse(JSON.stringify(questionSet));
-        newQuestionSet.question = '';
-        newQuestionSet.answer = '';
-        dispatch(app_onChange('questionSet', newQuestionSet));
+        Object.assign(questionSet, { question: '', answer: '' });
+        dispatch(app_onChange('questionSet', questionSet));
     }
 
 }
-
 export function onQuestionEdit(currentQuestion) {
     return (dispatch, getState) => {
         const { questionSet } = getState().appReducer;
-        let newQuestionSet = JSON.parse(JSON.stringify(questionSet));
-        newQuestionSet.question = currentQuestion.question;
-        newQuestionSet.answer = currentQuestion.answer;
-        dispatch(app_onChange('questionSet', newQuestionSet));
+        const { question, answer } = currentQuestion
+        Object.assign(questionSet, { question, answer })
+        dispatch(app_onChange('questionSet', questionSet));
     }
 }
 
 export function onSave() {
     return (dispatch, getState) => {
         const valid = dispatch(errorValidation());
+        const restoreInitialState = JSON.parse(JSON.stringify(initialState));
         if (valid) {
             const { userList, story, questionSet } = getState().appReducer;
             userList.push({
@@ -142,54 +135,26 @@ export function onSave() {
                 keywordList: story.keywordList,
                 questionsList: questionSet.questionsList, storyName: story.storyName
             });
-            dispatch(app_onChange('userList', userList));
-            dispatch(app_onChange('story', {
-                bannerImage: '',
-                storyName: '',
-                storyContent: '',
-                keyword: '',
-                keywordList: [],
-            }))
-            dispatch(app_onChange('questionSet', {
-                question: '',
-                answer: '',
-                questionsList: [],
-            }))
-            dispatch(app_onChange('storyError', {
-                storyNameError: '',
-                storyContentError: '',
-                keywordListError: ''
-            }))
-            dispatch(app_onChange('questionSetError', {
-                questionsListError: ''
-            },
-            ))
+            dispatch(app_onChange('userList', userList));;
+            dispatch(app_onChange('story', restoreInitialState.story));
+            dispatch(app_onChange('questionSet', restoreInitialState.questionSet));
+            dispatch(app_onChange('storyError', restoreInitialState.storyError));
+            dispatch(app_onChange('questionSetError', restoreInitialState.questionSetError));
         }
     }
+
 }
 
 export function onCancel() {
-    return (dispatch, getState) => {
-        dispatch(app_onChange('story', {
-            bannerImage: '',
-            storyName: '',
-            storyContent: '',
-            keyword: '',
-            keywordList: [],
-        }))
-        dispatch(app_onChange('questionSet', {
-            question: '',
-            answer: '',
-            questionsList: [],
-        }))
-        dispatch(app_onChange('storyError', {
-            storyNameError: '',
-            storyContentError: '',
-            keywordListError: ''
-        }))
-        dispatch(app_onChange('questionSetError', {
-            questionsListError: ''
-        }))
+    return (dispatch) => {
+        const restoreInitialState = JSON.parse(JSON.stringify(initialState));
+        console.log(restoreInitialState);
+        const { story, questionSet, storyError, questionSetError } = restoreInitialState;
+        dispatch(app_onChange('story', story));
+        dispatch(app_onChange('questionSet', questionSet));
+        dispatch(app_onChange('storyError', storyError));
+        dispatch(app_onChange('questionSetError', questionSetError));
+
     }
 }
 

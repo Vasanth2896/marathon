@@ -19,7 +19,6 @@ $commonBorderColor: #d4d5d6;
     border-top-left-radius: $commonBorderRadius;
     outline: none;
     resize: none;
-    border-bottom: 2px solid black;
   }
 
   button {
@@ -32,6 +31,28 @@ $commonBorderColor: #d4d5d6;
     cursor: pointer;
     font-size: 15px;
   }
+
+  input:focus {
+    border: 1px solid blue;
+  }
+
+  .ReactTable .rt-thead.-header {
+    height: 50px;
+    box-shadow: unset;
+    background: gainsboro;
+  }
+
+  .ReactTable .rt-thead .rt-tr {
+    text-align: left;
+  }
+
+  .ReactTable .rt-thead .rt-th{
+    flex: 100 0 auto;
+    width: 100px;
+    display: flex;
+    align-items: center;
+  }
+
 
 }
 

@@ -5,12 +5,13 @@ import { app_onChange, addWord, deleteWord, addImage } from '../../store/appActi
 import { bindActionCreators } from 'redux';
 
 const Story = (props) => {
+
     const { state, onChange, addWord, deleteWord, addImage } = props;
     const { story, storyError } = state;
     const currentStory = JSON.parse(JSON.stringify(story));
     const currentStoryError = JSON.parse(JSON.stringify(storyError));
-    const { storyNameError,storyContentError,keywordListError } = currentStoryError;
     const { storyName, storyContent, keyword, keywordList } = currentStory;
+    const { storyNameError, storyContentError, keywordListError } = currentStoryError;
     const [storyState, setStoryState] = useState(
         {
             keywordError: '',
@@ -19,22 +20,20 @@ const Story = (props) => {
     const { keywordError } = storyState;
 
     const handleChange = (e) => {
-        const newStory = { ...currentStory };
-        newStory[e.target.name] = e.target.value;
-        onChange('story', newStory);
-        const newStoryError = { ...currentStoryError };
-        newStoryError[`${e.target.name}Error`] = ''
-        onChange('storyError', newStoryError);
+        currentStory[e.target.name] = e.target.value;
+        onChange('story', currentStory);
+        currentStoryError[`${e.target.name}Error`] = ''
+        onChange('storyError', currentStoryError);
         if (e.target.name === 'keyword') {
-            newStoryError[`${e.target.name}ListError`] = '';
+            currentStoryError[`${e.target.name}ListError`] = '';
             setStoryState({ ...storyState, keywordError: '' });
         }
     }
 
     const handleKeyDown = (e) => {
         if (e.keyCode === 13) {
-            if (!keywordList.find(word => word === e.target.value)) {
-                addWord();
+            if (!keywordList.find(word => word === e.target.value.trim())) {
+                addWord(e.target.value.trim());
             }
             else {
                 setStoryState({ ...storyState, keywordError: 'The keyword already exists' })
@@ -44,18 +43,14 @@ const Story = (props) => {
 
     const handlePreview = (e) => {
         e.preventDefault();
-
         let file = e.target.files[0];
         let reader = new FileReader();
-
         if (e.target.files.length === 0) {
             return;
         }
-
         reader.onloadend = (e) => {
             addImage([reader.result]);
         }
-
         reader.readAsDataURL(file);
     }
 
@@ -88,11 +83,19 @@ const Story = (props) => {
                     value={storyContent}
                     onChange={(e) => handleChange(e)}
                     placeholder='About Story'></textarea>
-                    {storyContentError && <span style={{ color: 'red' }}>{storyContentError}</span>}
+                {storyContentError && <span style={{ color: 'red' }}>{storyContentError}</span>}
             </div>
             <div className='keywordContentContainer'>
+                <input type='text'
+                    name='keyword'
+                    value={keyword}
+                    onChange={(e) => handleChange(e)}
+                    onKeyDown={(e) => handleKeyDown(e)}
+                    className='keywordContent'
+                    placeholder='keywords'>
+                </input>
                 {keywordList.length > 0 &&
-                    <div style={{ display: 'flex' }}>
+                    <div style={{ display: 'flex', marginTop: '20px' }}>
                         {keywordList.map((item, index) => {
                             return (
                                 <span className='chipItem' key={index}>
@@ -104,16 +107,10 @@ const Story = (props) => {
                         }
                     </div>
                 }
-                <input type='text'
-                    name='keyword'
-                    value={keyword}
-                    onChange={(e) => handleChange(e)}
-                    onKeyDown={(e) => handleKeyDown(e)}
-                    className='keywordContent'
-                    placeholder='keywords'></input>
+
                 {keywordError && <span style={{ color: 'red' }}>{keywordError}</span>}
                 {keywordListError && <span style={{ color: 'red' }}>{keywordListError}</span>}
-                
+
             </div>
         </div>
     )

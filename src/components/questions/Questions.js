@@ -9,15 +9,14 @@ const Questions = (props) => {
     const { state, onChange, questionListManipulation, onQuestionEdit, onQuestionCancel, } = props;
     const { questionSet, questionSetError } = state;
     const currentQuestionSet = JSON.parse(JSON.stringify(questionSet));
-    const { question, answer, questionsList } = currentQuestionSet;
     const currentQuestionSetError = JSON.parse(JSON.stringify(questionSetError));
+    const { question, answer, questionsList } = currentQuestionSet;
     const { questionsListError } = currentQuestionSetError;
     const [questionState, setQuestionState] = useState(
         {
             error: {
                 questionError: '',
                 answerError: '',
-                questionListError: ''
             },
             editableIndex: null
         }
@@ -25,17 +24,21 @@ const Questions = (props) => {
     const { error, editableIndex } = questionState
     const { questionError, answerError } = error;
     const pointerEvents = editableIndex !== null ? 'none' : 'auto';
+    let newQuestionsList = [...questionsList];
 
     const handleChange = (e) => {
-        const newQuestionSet = { ...currentQuestionSet };
-        newQuestionSet[e.target.name] = e.target.value;
-        onChange('questionSet', newQuestionSet);
-        setQuestionState({ ...questionState, error: { questionError: '', answerError: '' } });
+        currentQuestionSet[e.target.name] = e.target.value;
+        onChange('questionSet', currentQuestionSet);
+        if (e.target.name === 'question') {
+            setQuestionState({ ...questionState, error: { ...error, questionError: '' } });
+        }
+        else if (e.target.name === 'answer') {
+            setQuestionState({ ...questionState, error: { ...error, answerError: '' } });
+        }
     }
 
     const addQuestions = () => {
         if (question && answer) {
-            let newQuestionsList = [...questionsList];
             if (editableIndex !== null) {
                 newQuestionsList = newQuestionsList.filter(questionItem => questionItem.question !== questionsList[editableIndex].question);
                 if ((newQuestionsList.find(questionItem => questionItem.question === question))) {
@@ -60,12 +63,16 @@ const Questions = (props) => {
 
         }
         else {
-            if (!question) {
+            if (!question && answer) {
                 setQuestionState({ ...questionState, error: { ...error, questionError: 'Please enter the question' } });
             }
-            else if (!answer) {
+            else if (question && !answer) {
                 setQuestionState({ ...questionState, error: { ...error, answerError: 'Please enter the answer' } });
             }
+            else if (!(question && answer)) {
+                setQuestionState({ ...questionState, error: { ...error, questionError: 'Please enter the question', answerError: 'Please enter the answer' } });
+            }
+
         }
 
     }
@@ -78,7 +85,6 @@ const Questions = (props) => {
     const deleteQuestion = (questionId) => {
         const newQuestionsList = questionsList.filter(item => item.id !== questionId);
         questionListManipulation(newQuestionsList);
-        // setQuestionState({ ...questionState, questionsList: newQuestionsList });
     }
 
     const editQuestion = (questionId, questionIndex) => {
@@ -90,7 +96,8 @@ const Questions = (props) => {
     const columns = [
         {
             Header: 'Question',
-            accessor: 'question'
+            accessor: 'question',
+            styles: 'height:30px'
         }, {
             Header: 'Answer',
             accessor: 'answer',
@@ -134,21 +141,22 @@ const Questions = (props) => {
                     <button
                         id='addBtn'
                         onClick={() => addQuestions()}
-                    >Add</button>
+                    >{editableIndex !== null ? 'Update' : 'Add'}</button>
                     <button
                         onClick={() => cancelQuestionOperation()}
                     >Cancel</button>
                 </div>
-            </div>
-            <ReactTable
-                columns={columns}
-                data={[...questionsList]}
-                showPagination={false}
-                style={{ height: '250px', backgroundColor: 'white', pointerEvents: pointerEvents }}
-                className="-striped -highlight"
-                noDataText='No Questions'
-            />
-            {questionsListError && <span style={{color:'red'}}>{questionsListError}</span>}
+            </div>{questionsList.length > 0 &&
+                <ReactTable
+                    columns={columns}
+                    data={[...questionsList]}
+                    showPagination={false}
+                    style={{ height: '250px', backgroundColor: 'white', pointerEvents: pointerEvents }}
+                    className="-striped -highlight"
+                    noDataText='No Questions'
+                />
+            }
+            {questionsListError && <span style={{ color: 'red' }}>{questionsListError}</span>}
         </div>
     )
 }

@@ -1,0 +1,43 @@
+.mainStoryTableContainer {
+  margin: auto;
+  width: 70%;
+  height: auto;
+}
+
+.ReactTable {
+  .rt-thead.-header {
+    // min-width: 400px;
+    background-color: #80808040;
+    box-shadow: unset;
+    height: 50px;
+  }
+
+  .rt-th rt-resizable-header -cursor-pointer {
+    flex: 100 0 auto;
+    width: 100px;
+  }
+
+  .rt-thead .rt-tr {
+    text-align: center;
+    align-items: center;
+  }
+
+  .rt-tbody .rt-tr-group {
+    height: 50px;
+    text-align: center;
+  }
+
+  .rt-tr {
+    align-items: center;
+  }
+
+  .rt-thead .rt-th.-cursor-pointer,
+  .rt-thead .rt-td.-cursor-pointer {
+    cursor: pointer;
+    outline: none;
+  }
+}
+
+.checkBoxes {
+  cursor: pointer;
+}

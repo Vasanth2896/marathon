@@ -3,7 +3,7 @@ $commonBorderColor: #d4d5d6;
 
 .storyContainer {
   box-sizing: border-box;
-  height: 520px;
+  height: auto;
   margin: 0px auto 0px auto;
   width: 65em;
   padding: 30px;
@@ -24,7 +24,6 @@ $commonBorderColor: #d4d5d6;
     border-top-left-radius: $commonBorderRadius;
     outline: none;
     resize: none;
-    border-bottom: 2px solid black;
   }
 
   button {
@@ -33,6 +32,11 @@ $commonBorderColor: #d4d5d6;
     border-radius: $commonBorderRadius;
     outline: none;
     cursor: pointer;
+  }
+
+  input:focus,
+  textarea:focus {
+    border: 1px solid blue;
   }
 
   div {
