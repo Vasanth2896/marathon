@@ -1,0 +1,11 @@
+.sortIconUp {
+  color: blue;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.sortIconDown {
+  color: blue;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: rotate(180deg);
+}

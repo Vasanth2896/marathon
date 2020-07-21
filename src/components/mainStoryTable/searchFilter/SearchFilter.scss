@@ -1,0 +1,25 @@
+.searchFilterBox {
+  padding: 13px;
+  width: 300px;
+  border-radius: 20px;
+  outline: unset;
+}
+
+.searchFilter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 450px;
+}
+
+.addStoryBtn {
+  width: 100px;
+  height: 50px;
+  color: white;
+  background: blue;
+  outline: none;
+  border: unset;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+}

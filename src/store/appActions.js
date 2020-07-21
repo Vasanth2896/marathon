@@ -1,3 +1,4 @@
+import _ from 'lodash';
 export const UPDATE_STATE = "UPDATE_STATE";
 export const initialState = {
     story: {
@@ -10,7 +11,8 @@ export const initialState = {
     storyError: {
         storyNameError: '',
         storyContentError: '',
-        keywordListError: ''
+        keywordListError: '',
+        // bannerImageError: ''
     },
     questionSet: {
         question: '',
@@ -20,7 +22,45 @@ export const initialState = {
     questionSetError: {
         questionsListError: ''
     },
-    userList: []
+    storyList: [
+        {
+            storyId: 1,
+            imageName: "dummyImage",
+            keywordList: [
+                "1"
+            ],
+            questionCount: 1,
+            questionSet: [
+                {
+                    id: 1,
+                    question: 1,
+                    answer: 1
+                }
+            ],
+            storyName: '1',
+            storyContent: '1',
+            select: false
+        },
+        {
+            storyId: 2,
+            imageName: "dummyImage",
+            keywordList: [
+                "2"
+            ],
+            questionCount: 1,
+            questionSet: [
+                {
+                    id: 1,
+                    question: "2",
+                    answer: "2",
+                }
+            ],
+            storyName: '2',
+            storyContent: "2",
+            select: false
+        }
+    ],
+    mainTableEditableIndex: null
 };
 
 export function app_onChange(name, value) {
@@ -30,17 +70,21 @@ export function app_onChange(name, value) {
 export function errorValidation() {
     return (dispatch, getState) => {
         const { story, storyError, questionSet, questionSetError } = getState().appReducer;
-        let newStory = JSON.parse(JSON.stringify(story));
-        let { storyName, storyContent, keywordList } = newStory;
-        let newQuestionSet = JSON.parse(JSON.stringify(questionSet));
+        let newStory = _.cloneDeep(story);
+        let { storyName, storyContent, keywordList, bannerImage } = newStory;
+        let newQuestionSet = _.cloneDeep(questionSet);
         let { questionsList } = newQuestionSet;
         let newStoryError = { ...storyError };
         let newQuestionSetError = { ...questionSetError };
 
-        if (!storyName) {
+        if (!bannerImage) {
+            newStoryError.bannerImageError = 'Please upload an image';
+        }
+
+        if (!storyName || storyName.replace(/\s/g, '').length <= 0) {
             newStoryError.storyNameError = 'Please enter a story name';
         }
-        if (!storyContent) {
+        if (!storyContent || storyContent.replace(/\s/g, '').length <= 0) {
             newStoryError.storyContentError = 'Please enter a story Content';
         }
         if (!keywordList.length) {
@@ -68,7 +112,7 @@ export function errorValidation() {
 export function addImage(image) {
     return (dispatch, getState) => {
         const { story } = getState().appReducer;
-        const newStory = JSON.parse(JSON.stringify(story));
+        const newStory = _.cloneDeep(story);
         Object.assign(newStory, { bannerImage: image })
         dispatch(app_onChange('story', newStory));
     }
@@ -76,11 +120,10 @@ export function addImage(image) {
 
 export function addWord(newKeyword) {
     return (dispatch, getState) => {
-        console.log(newKeyword.split(''));
         let { story, storyError } = getState().appReducer;
         let { keywordList } = story;
         let newKeywordList = [...keywordList];
-        newKeywordList.push(newKeyword)
+        newKeywordList.push(newKeyword);
         Object.assign(story, { keywordList: newKeywordList, keyword: '' });
         Object.assign(storyError, { keywordListError: '' });
         dispatch(app_onChange('story', story));
@@ -127,19 +170,41 @@ export function onQuestionEdit(currentQuestion) {
 export function onSave() {
     return (dispatch, getState) => {
         const valid = dispatch(errorValidation());
-        const restoreInitialState = JSON.parse(JSON.stringify(initialState));
+        const restoreInitialState = _.cloneDeep(initialState);
         if (valid) {
-            const { userList, story, questionSet } = getState().appReducer;
-            userList.push({
-                id: userList.length + 1, bannerImage: story.bannerImage,
-                keywordList: story.keywordList,
-                questionsList: questionSet.questionsList, storyName: story.storyName
-            });
-            dispatch(app_onChange('userList', userList));;
+            const { storyList, story, questionSet, mainTableEditableIndex } = getState().appReducer;
+            if (mainTableEditableIndex === null) {
+                storyList.push({
+                    storyId: storyList.length + 1,
+                    // bannerImage: story.bannerImage,
+                    imageName: 'dummyImage',
+                    keywordList: story.keywordList,
+                    questionCount: questionSet.questionsList.length,
+                    questionSet: questionSet.questionsList,
+                    storyName: story.storyName.trim(),
+                    storyContent: story.storyContent,
+                    select: false
+                });
+            }
+            else {
+                const editedStory = {
+                    storyId: mainTableEditableIndex + 1, 
+                    keywordList: story.keywordList,
+                    imageName: 'dummyImage',
+                    questionCount: questionSet.questionsList.length,
+                    questionSet: questionSet.questionsList,
+                    storyName: story.storyName.trim(),
+                    storyContent: story.storyContent,
+                    select: false
+                };
+                storyList.splice(mainTableEditableIndex, 1, editedStory);
+            }
+            dispatch(app_onChange('storyList', storyList));;
             dispatch(app_onChange('story', restoreInitialState.story));
             dispatch(app_onChange('questionSet', restoreInitialState.questionSet));
             dispatch(app_onChange('storyError', restoreInitialState.storyError));
             dispatch(app_onChange('questionSetError', restoreInitialState.questionSetError));
+            dispatch(app_onChange('mainTableEditableIndex', null));
         }
     }
 
@@ -147,14 +212,30 @@ export function onSave() {
 
 export function onCancel() {
     return (dispatch) => {
-        const restoreInitialState = JSON.parse(JSON.stringify(initialState));
-        console.log(restoreInitialState);
+        const restoreInitialState = _.cloneDeep(initialState);
         const { story, questionSet, storyError, questionSetError } = restoreInitialState;
         dispatch(app_onChange('story', story));
         dispatch(app_onChange('questionSet', questionSet));
         dispatch(app_onChange('storyError', storyError));
         dispatch(app_onChange('questionSetError', questionSetError));
+        dispatch(app_onChange('mainTableEditableIndex', null));
+    }
+}
 
+export function mainTableEdit(editableData, mainTableEditableIndex) {
+    return (dispatch, getState) => {
+        const { story, questionSet } = getState().appReducer;
+        let newStory = _.cloneDeep(story);
+        let newQuestionSet = _.cloneDeep(questionSet);
+
+        Object.assign(newStory, {
+            bannerImage: editableData.imageName, storyName: editableData.storyName,
+            storyContent: editableData.storyContent, keywordList: editableData.keywordList
+        });
+        Object.assign(newQuestionSet, { questionsList: editableData.questionSet });
+        dispatch(app_onChange('mainTableEditableIndex', mainTableEditableIndex))
+        dispatch(app_onChange('story', newStory));
+        dispatch(app_onChange('questionSet', newQuestionSet));
     }
 }
 

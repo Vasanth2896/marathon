@@ -2,19 +2,18 @@
   margin: auto;
   width: 70%;
   height: auto;
+
+  .searchFilterContainer {
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
 .ReactTable {
-  .rt-thead.-header {
-    // min-width: 400px;
-    background-color: #80808040;
-    box-shadow: unset;
-    height: 50px;
-  }
-
-  .rt-th rt-resizable-header -cursor-pointer {
-    flex: 100 0 auto;
-    width: 100px;
+  .rt-th.rt-resizable-header.-cursor-pointer {
+    pointer-events: none;
   }
 
   .rt-thead .rt-tr {
@@ -31,13 +30,45 @@
     align-items: center;
   }
 
-  .rt-thead .rt-th.-cursor-pointer,
-  .rt-thead .rt-td.-cursor-pointer {
-    cursor: pointer;
-    outline: none;
+  .rt-resizable-header-content {
+    width: 100%;
+  }
+
+  .rt-resizer {
+    pointer-events: auto;
+    top: 15px;
   }
 }
 
 .checkBoxes {
   cursor: pointer;
+}
+
+.actionIconContainer {
+  display: flex;
+  width: 50px;
+  justify-content: space-evenly;
+}
+
+.ReactTable .rt-tbody .rt-tr-group {
+  height: 50px;
+  text-align: left;
+}
+
+.innerDiv {
+  pointer-events: none;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.sortIconUp {
+  color: blue;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.sortIconDown {
+  color: blue;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: rotate(180deg);
 }

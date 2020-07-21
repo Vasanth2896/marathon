@@ -24,6 +24,7 @@ const Questions = (props) => {
     const { error, editableIndex } = questionState
     const { questionError, answerError } = error;
     const pointerEvents = editableIndex !== null ? 'none' : 'auto';
+    
     let newQuestionsList = [...questionsList];
 
     const handleChange = (e) => {
@@ -39,31 +40,41 @@ const Questions = (props) => {
 
     const addQuestions = () => {
         if (question && answer) {
-            if (editableIndex !== null) {
-                newQuestionsList = newQuestionsList.filter(questionItem => questionItem.question !== questionsList[editableIndex].question);
-                if ((newQuestionsList.find(questionItem => questionItem.question === question))) {
-                    setQuestionState({ ...questionState, error: { ...error, questionError: 'The question already exists' } });
+            const questionEmptySpace = question.replace(/\s/g, '');
+            const answerEmptySpace = answer.replace(/\S/g, '');
+            if (questionEmptySpace.length <= 0 && answerEmptySpace.length <= 0) {
+                if (questionEmptySpace.length <= 0) {
+                    console.log('question is empty');
+                }
+                if (answerEmptySpace.length <= 0) {
+                    console.log('answer is empty');
+                }
+            } else {
+                if (editableIndex !== null) {
+                    newQuestionsList = newQuestionsList.filter(questionItem => questionItem.question !== questionsList[editableIndex].question);
+                    if ((newQuestionsList.find(questionItem => questionItem.question === question))) {
+                        setQuestionState({ ...questionState, error: { ...error, questionError: 'The question already exists' } });
+                    }
+                    else {
+                        newQuestionsList.splice(editableIndex, 0, { id: editableIndex + 1, question, answer })
+                        questionListManipulation(newQuestionsList);
+                        setQuestionState({ ...questionState, error: { questionError: '', answerError: '' }, editableIndex: null });
+                    }
                 }
                 else {
-                    newQuestionsList.splice(editableIndex, 0, { id: editableIndex + 1, question, answer })
-                    questionListManipulation(newQuestionsList);
-                    setQuestionState({ ...questionState, error: { questionError: '', answerError: '' }, editableIndex: null });
+                    if (newQuestionsList.find(questionItem => questionItem.question === question)) {
+                        setQuestionState({ ...questionState, error: { ...error, questionError: 'The question already exists' } });
+                    }
+                    else {
+                        newQuestionsList.push({ id: questionsList.length + 1, question, answer });
+                        questionListManipulation(newQuestionsList);
+                        setQuestionState({ ...questionState, error: { questionError: '', answerError: '' }, editableIndex: null });
+                    }
                 }
             }
-            else {
-                if (newQuestionsList.find(questionItem => questionItem.question === question)) {
-                    setQuestionState({ ...questionState, error: { ...error, questionError: 'The question already exists' } });
-                }
-                else {
-                    newQuestionsList.push({ id: questionsList.length + 1, question, answer });
-                    questionListManipulation(newQuestionsList);
-                    setQuestionState({ ...questionState, error: { questionError: '', answerError: '' }, editableIndex: null });
-                }
-            }
-
         }
         else {
-            if (!question && answer) {
+            if ((!question) && answer) {
                 setQuestionState({ ...questionState, error: { ...error, questionError: 'Please enter the question' } });
             }
             else if (question && !answer) {
@@ -72,7 +83,6 @@ const Questions = (props) => {
             else if (!(question && answer)) {
                 setQuestionState({ ...questionState, error: { ...error, questionError: 'Please enter the question', answerError: 'Please enter the answer' } });
             }
-
         }
 
     }

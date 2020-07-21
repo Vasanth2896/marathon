@@ -1,76 +1,129 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MainStoryTable.scss'
 import ReactTable from 'react-table-v6';
+import Checkbox from 'react-three-state-checkbox'
+import { headerStyle } from './headerStyles'
+import Pagination from "./pagination/Pagination";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
-import { faEllipsisH } from '@fortawesome/free-solid-svg-icons'
-import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
+// import { faEllipsisV } from '@fortawesome/free-solid-svg-icons'
+// import Menu from '@material-ui/core/Menu';
+// import MenuItem from '@material-ui/core/MenuItem';
+import SearchFilter from './searchFilter/SearchFilter';
+import Resizer from './resizer/Resizer';
+import Sorter from './sorter/Sorter';
+import { connect } from 'react-redux';
+import { app_onChange, mainTableEdit } from '../../store/appActions';
+import { bindActionCreators } from 'redux';
+import _ from "lodash"
+import { useHistory } from 'react-router-dom';
+// import RootRef from '@material-ui/core/RootRef';
 
-const MainStoryTable = () => {
-    const [state, setState] = useState({
-        dummyData: [{
-            id: 1,
-            storyName: 'Red Riding Hood',
-            imageName: 'Hood',
-            questions: [{
-                id: 1,
-                question: 'Who was the villain of the little red riding hood?',
-                answer: 'It was a fox'
-            }],
-            select: false
-        },
-        {
-            id: 2,
-            storyName: 'sindbad',
-            imageName: 'sindbad',
-            questions: [{
-                id: 1,
-                question: 'How many adventures did sindbad have?',
-                answer: 'many'
-            }],
-            select: false
-        }],
-        selectAll: false
+
+
+const MainStoryTable = (props) => {
+    const { state, onChange, mainTableEdit } = props
+    const currentState = _.cloneDeep(state);
+    const { storyList } = currentState;
+    let newStoryList = _.cloneDeep(storyList);
+    const history = useHistory();
+    const [storyTableState, setStoryTableState] = useState({
+        filteredData: [],
+        selectAll: false,
+        selectAllIndeterminate: false,
+        searchInput: '',
+        storyIdSort: false,
+        storyNameSort: false,
+        imageNameSort: false,
+        questionCountSort: false
     })
 
-    const { selectAll, dummyData } = state
-    let newDummyData = JSON.parse(JSON.stringify(dummyData));
+    const { selectAll,
+        selectAllIndeterminate,
+        searchInput, filteredData, storyIdSort, storyNameSort, imageNameSort, questionCountSort } = storyTableState
+
 
     const handleCheckAllChange = (e) => {
         let checked = e.target.checked;
-        checked ? newDummyData.map(user => user.select = true) : newDummyData.map(user => user.select = false);
-        setState({ ...state, dummyData: newDummyData, selectAll: !selectAll });
+        checked ? newStoryList.map(user => user.select = true) : newStoryList.map(user => user.select = false);
+        setStoryTableState({ ...storyTableState, selectAll: !selectAll, selectAllIndeterminate: false });
+        onChange('storyList', newStoryList);
     }
 
-    const handleCheckChange = (data) => {
-        const test = newDummyData.find(user => user.id === data.id);
+    const handleCheckChange = (CheckedUser) => {
+        const test = newStoryList.find(user => user.storyId === CheckedUser.storyId);
         if (test) {
             test.select = !test.select;
         }
-        const selection = newDummyData.every(user => user.select === true);
-        selection ? setState({ ...state, dummyData: newDummyData, selectAll: true }) : setState({ ...state, dummyData: newDummyData, selectAll: false });
+
+        if (!(newStoryList.every(user => user.select) || newStoryList.every(user => !user.select))) {
+            setStoryTableState({ ...storyTableState, selectAllIndeterminate: true });
+        } else {
+            const selection = newStoryList.every(user => user.select);
+            selection ? setStoryTableState({ ...storyTableState, selectAll: true, selectAllIndeterminate: false }) : setStoryTableState({ ...storyTableState, selectAll: false, selectAllIndeterminate: false });
+        }
+        onChange('storyList', newStoryList);
     }
 
-    const columnHeaderStyle = {
-        display: 'flex',
-        justifyContent: 'space-evenly',
-    };
+    useEffect(() => {
+        let newFilteredData = [];
+        if (searchInput) {
+            newFilteredData = newStoryList.filter(value => {
+                return (
+                    value.storyName.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    value.imageName.toLowerCase().includes(searchInput.toLowerCase())
+                );
+
+            });
+        }
+        setStoryTableState({ ...storyTableState, filteredData: newFilteredData });
+    }, [searchInput, selectAll]);
+
+    const handleSearchInputChange = (e) => {
+        setStoryTableState({ ...storyTableState, searchInput: e.target.value })
+    }
+
+    const handleSortChangeStyle = (props) => {
+        if (props[0].id !== '') {
+            const sortStyle = { ...storyTableState };
+            sortStyle[`${props[0].id + 'Sort'}`] = props[0].desc;
+            setStoryTableState({ ...sortStyle })
+        }
+    }
+
+    const handleDeleteData = (index) => {
+        newStoryList.splice(index, 1);
+        onChange('storyList', newStoryList);
+    }
+
+    const handleEditData = (value, index) => {
+        mainTableEdit(value, index);
+        history.push('/storyform');
+    }
+
+    // const [anchorEl, setAnchorEl] = useState(null);
+    // const handleClick = (event) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
+
+    // const handleClose = (e) => {
+    //     setAnchorEl(null);
+    // };
 
     const columns = [
         {
+            headerStyle: { ...headerStyle, pointerEvents: 'none', paddingLeft: '5px', paddingRight: '24px' },
             Header: (
-                <div style={{ width: '40px' }}>
-                    <input type='checkbox'
-                        checked={selectAll}
+                <div >
+                    <Checkbox
+                        style={{ pointerEvents: 'auto' }}
+                        indeterminate={selectAllIndeterminate}
+                        checked={selectAll || ''}
                         className='checkBoxes'
                         onChange={(e) => handleCheckAllChange(e)}
-                    ></input>
-                    <div className='rt-resizer' style={{ top: '5px' }} >
-                        <FontAwesomeIcon style={{ color: 'blue' }} icon={faGripVertical} />
-                    </div>
+                    ></Checkbox>
                 </div>
             ),
-            id: "checkbox",
             accessor: "",
             Cell: ({ original }) => {
                 return (
@@ -80,77 +133,128 @@ const MainStoryTable = () => {
                         checked={original.select}
                         onChange={() => handleCheckChange(original)}
                     />
+                )
+            },
+            width: 50,
+            resizable: false,
+        },
+        {
+            headerStyle: headerStyle,
+            Header: (
+                <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }} >
+                    Story ID
+                    <Sorter className={storyIdSort ? 'sortIconDown' : 'sortIconUp'} />
+                    <Resizer className='rt-resizer' />
+                </div >
+            ),
+            accessor: 'storyId',
+            width: 200
+        }, {
+
+            headerStyle: headerStyle,
+            Header: (
+                <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                    Story Name
+                    <Sorter className={storyNameSort ? 'sortIconDown' : 'sortIconUp'} />
+                    <Resizer className='rt-resizer' />
+                </div>),
+            accessor: 'storyName',
+            width: 200
+        }, {
+            headerStyle: headerStyle,
+            Header: (
+                <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                    Image Name
+                    <Sorter className={imageNameSort ? 'sortIconDown' : 'sortIconUp'} />
+                    <Resizer className='rt-resizer' />
+                </div>),
+            accessor: 'imageName',
+            width: 200
+        }, {
+
+            headerStyle: headerStyle,
+            Header: (
+                <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                    Question Count
+                    <Sorter className={questionCountSort ? 'sortIconDown' : 'sortIconUp'} />
+                    <Resizer className='rt-resizer' />
+                </div>),
+            accessor: 'questionCount',
+            width: 200
+        },
+        {
+            headerStyle: headerStyle,
+            Header: (
+                <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                    Actions
+                </div>),
+            accessor: '',
+            Cell: ({ value, index }) => {
+                return (
+                    <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                        <FontAwesomeIcon style={{ color: 'blue', cursor: 'pointer' }} icon={faTrash} onClick={() => handleDeleteData(index)} />
+                        <FontAwesomeIcon style={{ color: 'blue', cursor: 'pointer' }} icon={faEdit} onClick={() => handleEditData(value, index)} />
+
+
+                        <div>
+                            {/* <FontAwesomeIcon style={{ color: 'blue', cursor: 'pointer' }} icon={faEllipsisV} aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick} /> */}
+                            {/* <FontAwesomeIcon style={{ color: 'blue', cursor: 'pointer' }} icon={faEllipsisV} aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick} /> */}
+                            {/* <RootRef rootRef={ref} >
+                            <Menu
+                                id="simple-menu"
+                                anchorEl={anchorEl}
+                                // keepMounted
+                                open={Boolean(anchorEl)}
+                                onClose={handleClose}
+                            >
+                                <MenuItem onClick={() => handleEditData(row)}>Edit</MenuItem>
+                                <MenuItem onClick={() => { handleDeleteData(row) }}>Delete</MenuItem>
+                            </Menu>
+                            </RootRef> */}
+
+                        </div>
+                    </div>
+
                 );
             },
-        },
-        {
-            Header: (
-                <div style={columnHeaderStyle}>
-                    Story ID
-                    <FontAwesomeIcon style={{ color: 'blue' }} icon={faSortAmountDown} />
-                    <div className='rt-resizer' style={{ top: '5px' }} >
-                        <FontAwesomeIcon style={{ color: 'blue' }} icon={faGripVertical} />
-                    </div>
-                </div>),
-            accessor: 'id',
-
-        }, {
-            Header: (
-                <div style={columnHeaderStyle}>
-                    Story Name
-                    <FontAwesomeIcon style={{ color: 'blue' }} icon={faSortAmountDown} />
-                    <div className='rt-resizer' style={{ top: '5px' }} >
-                        <FontAwesomeIcon style={{ color: 'blue' }} icon={faGripVertical} />
-                    </div>
-                </div>),
-            accessor: 'storyName'
-        }, {
-            Header: (
-                <div style={columnHeaderStyle} >
-                    Image Name
-                    <FontAwesomeIcon style={{ color: 'blue' }} icon={faSortAmountDown} />
-                    <div className='rt-resizer' style={{ top: '5px' }} >
-                        <FontAwesomeIcon style={{ color: 'blue' }} icon={faGripVertical} />
-                    </div>
-                </div>),
-            accessor: 'imageName'
-        }, {
-            Header: (
-                <div style={columnHeaderStyle}>
-                    Question Count
-                    <FontAwesomeIcon style={{ color: 'blue' }} icon={faSortAmountDown} />
-                    <div className='rt-resizer' style={{ top: '5px' }}  >
-                        <FontAwesomeIcon style={{ color: 'blue' }} icon={faGripVertical} />
-                    </div>
-                </div>),
-            accessor: 'questions.length',
-        },
-        {
-            Header: '',
-            accessor: '',
-            Cell: ({ original }) => {
-                return (
-                    <div>
-                        <FontAwesomeIcon style={{ color: 'blue' }} icon={faEllipsisH} />
-                    </div>
-                );
-            }
+            resizable: false,
         }
-
     ];
 
     return (
         <div className='mainStoryTableContainer'>
-            <h1>This is the main story table</h1>
-
-            <ReactTable
-                columns={columns}
-                data={dummyData}
-                className="-striped -highlight"
-
-            />
+            <div className='searchFilterContainer'>
+                <h2>Story Details</h2>
+                <SearchFilter searchInputValue={searchInput} searchInputChange={handleSearchInputChange} />
+            </div>
+            {storyList.length > 0 &&
+                <div>
+                    <ReactTable
+                        PaginationComponent={Pagination}
+                        columns={columns}
+                        data={filteredData.length > 0 ? filteredData : newStoryList}
+                        className="-striped -highlight"
+                        minRows={0}
+                        onSortedChange={(props) => handleSortChangeStyle(props)}
+                    />
+                </div>
+            }
         </div>
     )
 }
 
-export default MainStoryTable;
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({
+        onChange: app_onChange,
+        mainTableEdit: mainTableEdit
+    }, dispatch)
+}
+
+
+const mapStateToProps = (state) => {
+    return {
+        state: state.appReducer
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MainStoryTable);
