@@ -1,25 +1,25 @@
 import React, { useState, useRef } from 'react';
 import './Story.scss'
 import { connect } from 'react-redux';
-import { app_onChange, addWord, deleteWord, addImage } from '../../store/appActions';
+import { app_onChange, addWord, deleteWord } from '../../store/appActions';
 import { bindActionCreators } from 'redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload } from '@fortawesome/free-solid-svg-icons'
 
 const Story = (props) => {
-    const { state, onChange, addWord, deleteWord, addImage } = props;
+    const { state, onChange, addWord, deleteWord } = props;
     const { story, storyError } = state;
     const currentStory = JSON.parse(JSON.stringify(story));
     const currentStoryError = JSON.parse(JSON.stringify(storyError));
-    const { storyName, storyContent, keyword, keywordList,bannerImage } = currentStory;
-    const { storyNameError, storyContentError, keywordListError,bannerImageError } = currentStoryError;
+    const { storyName, storyContent, keyword, keywordList, bannerImage } = currentStory;
+    const { storyNameError, storyContentError, keywordListError, bannerImageError } = currentStoryError;
     const [storyState, setStoryState] = useState(
         {
             keywordError: '',
             localBannerImageError: '',
         }
     )
-    const { keywordError,localBannerImageError } = storyState;
+    const { keywordError, localBannerImageError } = storyState;
 
     const fileInputRef = useRef();
 
@@ -50,24 +50,13 @@ const Story = (props) => {
         let file = e.target.files[0];
         let allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
         if (!allowedExtensions.exec(file.name)) {
-            setStoryState({ ...state, localBannerImageError: 'Please upload Image' });
+            setStoryState({ ...state, localBannerImageError: 'Please upload only Images' });
         }
         else {
             setStoryState({ ...state, localBannerImageError: '' });
+            currentStory[e.target.name] = file.name;
+            onChange('story', currentStory);
         }
-
-        // let reader = new FileReader();
-        // if (e.target.files.length === 0) {
-        //     return;
-        // }
-
-        // currentStoryError[`${e.target.name}Error`] = ''
-        // onChange('storyError', currentStoryError);
-
-        // reader.onloadend = (e) => {
-        //     addImage([reader.result]);
-        // }
-        // reader.readAsDataURL(file);
     }
 
     const handleDelete = (existingWord) => {
@@ -91,18 +80,27 @@ const Story = (props) => {
                         </span>
                         {storyNameError && <span style={{ color: 'red' }}>{storyNameError}</span>}
                     </span>
-                    <span>
-                        <button onClick={() => fileInputRef.current.click()}>
-                            <FontAwesomeIcon icon={faUpload} />
+                    <span >
+                        <span className='imageUploadContainer'>
+                            <span>
+                                <button onClick={() => fileInputRef.current.click()}>
+                                    <FontAwesomeIcon icon={faUpload} />
                             Banner Image
                         </button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            hidden
-                            accept="image/*"
-                            onChange={(e) => handlePreview(e)}
-                        />
+                            </span>
+                            <span>
+                                <input
+                                    name='bannerImage'
+                                    ref={fileInputRef}
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={(e) => handlePreview(e)}
+                                />
+                                {bannerImage && <span>{bannerImage}</span>}
+                            </span>
+                        </span>
+                        {bannerImageError && <span style={{ color: 'red' }}>{bannerImageError}</span>}
                         {localBannerImageError && <span style={{ color: 'red' }}>{localBannerImageError}</span>}
                     </span>
                 </div>
@@ -142,7 +140,7 @@ const Story = (props) => {
 
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 
@@ -156,8 +154,7 @@ const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({
         onChange: app_onChange,
         addWord: addWord,
-        deleteWord: deleteWord,
-        addImage: addImage
+        deleteWord: deleteWord
     }, dispatch)
 }
 

@@ -37,6 +37,7 @@ $commonBorderColor: #d4d5d6;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    margin-right: 20px;
   }
 
   input:focus,
@@ -49,10 +50,16 @@ $commonBorderColor: #d4d5d6;
   }
 }
 .storyNameContainer {
-  width: 45%;
+  width: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.imageUploadContainer {
+  display: flex;
+  align-items: center;
+  width: 40em;
 }
 
 .storyName {
@@ -65,6 +72,7 @@ $commonBorderColor: #d4d5d6;
   display: flex;
   align-items: center;
   justify-content: space-around;
+
 }
 
 .storyContent {

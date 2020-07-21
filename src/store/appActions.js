@@ -109,15 +109,6 @@ export function errorValidation() {
 
 }
 
-export function addImage(image) {
-    return (dispatch, getState) => {
-        const { story } = getState().appReducer;
-        const newStory = _.cloneDeep(story);
-        Object.assign(newStory, { bannerImage: image })
-        dispatch(app_onChange('story', newStory));
-    }
-}
-
 export function addWord(newKeyword) {
     return (dispatch, getState) => {
         let { story, storyError } = getState().appReducer;
@@ -176,8 +167,7 @@ export function onSave() {
             if (mainTableEditableIndex === null) {
                 storyList.push({
                     storyId: storyList.length + 1,
-                    // bannerImage: story.bannerImage,
-                    imageName: 'dummyImage',
+                    imageName: story.bannerImage,
                     keywordList: story.keywordList,
                     questionCount: questionSet.questionsList.length,
                     questionSet: questionSet.questionsList,
@@ -190,7 +180,7 @@ export function onSave() {
                 const editedStory = {
                     storyId: mainTableEditableIndex + 1, 
                     keywordList: story.keywordList,
-                    imageName: 'dummyImage',
+                    imageName: story.bannerImage,
                     questionCount: questionSet.questionsList.length,
                     questionSet: questionSet.questionsList,
                     storyName: story.storyName.trim(),
