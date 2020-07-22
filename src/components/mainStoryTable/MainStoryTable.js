@@ -65,6 +65,15 @@ const MainStoryTable = (props) => {
         onChange('storyList', newStoryList);
     }
 
+    const handleCheckboxes = () => {
+        if (newStoryList.every(user => user.select)) {
+            setStoryTableState({ ...storyTableState, selectAll: true })
+        }
+        else if (!(newStoryList.every(user => user.select) || newStoryList.every(user => !user.select))) {
+            setStoryTableState({ ...storyTableState, selectAllIndeterminate: true, selectAll: false });
+        }
+    }
+
     useEffect(() => {
         let newFilteredData = [];
         if (searchInput) {
@@ -76,8 +85,13 @@ const MainStoryTable = (props) => {
 
             });
         }
+        handleCheckboxes();
         setStoryTableState({ ...storyTableState, filteredData: newFilteredData });
     }, [searchInput, selectAll]);
+
+    useEffect(() => {
+        handleCheckboxes();
+    }, [selectAll]);
 
     const handleSearchInputChange = (e) => {
         setStoryTableState({ ...storyTableState, searchInput: e.target.value })

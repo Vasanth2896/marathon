@@ -5,12 +5,13 @@ import { app_onChange, addWord, deleteWord } from '../../store/appActions';
 import { bindActionCreators } from 'redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload } from '@fortawesome/free-solid-svg-icons'
+import _ from 'lodash'
 
 const Story = (props) => {
     const { state, onChange, addWord, deleteWord } = props;
     const { story, storyError } = state;
-    const currentStory = JSON.parse(JSON.stringify(story));
-    const currentStoryError = JSON.parse(JSON.stringify(storyError));
+    const currentStory = _.cloneDeep(story);
+    const currentStoryError = _.cloneDeep(storyError)
     const { storyName, storyContent, keyword, keywordList, bannerImage } = currentStory;
     const { storyNameError, storyContentError, keywordListError, bannerImageError } = currentStoryError;
     const [storyState, setStoryState] = useState(
@@ -36,11 +37,17 @@ const Story = (props) => {
 
     const handleKeyDown = (e) => {
         if (e.keyCode === 13) {
-            if (!keywordList.find(word => word === e.target.value.trim())) {
-                addWord(e.target.value.trim());
-            }
-            else {
-                setStoryState({ ...storyState, keywordError: 'The keyword already exists' })
+            if (keywordList) {
+                const keywordEmptySpace = keyword.replace(/\s/g, '');
+                if (keywordEmptySpace.length <= 0) {
+                    setStoryState({ ...storyState, keywordError: 'please enter a keyword' });
+                }
+                else if (!keywordList.find(word => word === e.target.value.trim())) {
+                    addWord(e.target.value.trim());
+                }
+                else {
+                    setStoryState({ ...storyState, keywordError: 'The keyword already exists' });
+                }
             }
         }
     }
@@ -56,6 +63,8 @@ const Story = (props) => {
             setStoryState({ ...state, localBannerImageError: '' });
             currentStory[e.target.name] = file.name;
             onChange('story', currentStory);
+            currentStoryError[`${e.target.name}Error`] = ''
+            onChange('storyError', currentStoryError);
         }
     }
 
@@ -134,7 +143,6 @@ const Story = (props) => {
                             }
                         </div>
                     }
-
                     {keywordError && <span style={{ color: 'red' }}>{keywordError}</span>}
                     {keywordListError && <span style={{ color: 'red' }}>{keywordListError}</span>}
 

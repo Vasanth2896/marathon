@@ -4,12 +4,13 @@ import ReactTable from 'react-table-v6';
 import { app_onChange, questionListManipulation, onQuestionEdit, onQuestionCancel } from '../../store/appActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import _ from 'lodash';
 
 const Questions = (props) => {
     const { state, onChange, questionListManipulation, onQuestionEdit, onQuestionCancel, } = props;
     const { questionSet, questionSetError } = state;
-    const currentQuestionSet = JSON.parse(JSON.stringify(questionSet));
-    const currentQuestionSetError = JSON.parse(JSON.stringify(questionSetError));
+    const currentQuestionSet = _.cloneDeep(questionSet);
+    const currentQuestionSetError = _.cloneDeep(questionSetError);
     const { question, answer, questionsList } = currentQuestionSet;
     const { questionsListError } = currentQuestionSetError;
     const [questionState, setQuestionState] = useState(
@@ -24,7 +25,7 @@ const Questions = (props) => {
     const { error, editableIndex } = questionState
     const { questionError, answerError } = error;
     const pointerEvents = editableIndex !== null ? 'none' : 'auto';
-    
+
     let newQuestionsList = [...questionsList];
 
     const handleChange = (e) => {
@@ -41,15 +42,11 @@ const Questions = (props) => {
     const addQuestions = () => {
         if (question && answer) {
             const questionEmptySpace = question.replace(/\s/g, '');
-            const answerEmptySpace = answer.replace(/\S/g, '');
+            const answerEmptySpace = answer.replace(/\s/g, '');
             if (questionEmptySpace.length <= 0 && answerEmptySpace.length <= 0) {
-                if (questionEmptySpace.length <= 0) {
-                    console.log('question is empty');
-                }
-                if (answerEmptySpace.length <= 0) {
-                    console.log('answer is empty');
-                }
-            } else {
+                setQuestionState({ ...questionState, error: { ...error, questionError: 'Please enter the question', answerError: 'Please enter the answer' } });
+            }
+            else {
                 if (editableIndex !== null) {
                     newQuestionsList = newQuestionsList.filter(questionItem => questionItem.question !== questionsList[editableIndex].question);
                     if ((newQuestionsList.find(questionItem => questionItem.question === question))) {
