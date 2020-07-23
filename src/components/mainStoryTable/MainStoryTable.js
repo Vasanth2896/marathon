@@ -10,7 +10,6 @@ import { faEllipsisV } from '@fortawesome/free-solid-svg-icons'
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import SearchFilter from './searchFilter/SearchFilter';
-import Resizer from './resizer/Resizer';
 import Sorter from './sorter/Sorter';
 import { connect } from 'react-redux';
 import { app_onChange, mainTableEdit } from '../../store/appActions';
@@ -18,7 +17,6 @@ import { bindActionCreators } from 'redux';
 import _ from "lodash"
 import { useHistory } from 'react-router-dom';
 import RootRef from '@material-ui/core/RootRef';
-import { noAuto } from '@fortawesome/fontawesome-svg-core';
 
 
 
