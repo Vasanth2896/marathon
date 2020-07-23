@@ -10,7 +10,7 @@ const SearchFilter = (props) => {
             <span>
                 <input value={searchInputValue} onChange={(e) => searchInputChange(e)} className='searchFilterBox' placeholder='Search' type='search' />
             </span>
-            <button className='addStoryBtn' onClick={() => history.push('/storyform')} >Add Story</button>
+            <button className='addStoryBtn' onClick={() => history.push('/storyform')} >New story</button>
         </div>
     )
 }

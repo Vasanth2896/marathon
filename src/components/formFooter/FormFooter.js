@@ -28,7 +28,7 @@ const FormFooter = (props) => {
         <footer className='FormFooterContainer'>
             <div className='FormFooterButtonContainer'>
                 <button name='cancel' onClick={() => handleCancel()} >CANCEL</button>
-                <button id='saveButton' name='add' onClick={() => handleSave()} >
+                <button id='saveButton' onClick={() => handleSave()} >
                     { mainTableEditableIndex === null?'SAVE':'UPDATE'}
                 </button>
             </div>

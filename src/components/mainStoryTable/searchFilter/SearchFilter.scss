@@ -1,8 +1,13 @@
 .searchFilterBox {
+  background:url('search-512.png');
+  background-position: 5px 5px;
+  background-repeat: no-repeat;
   padding: 13px;
   width: 300px;
-  border-radius: 20px;
+  border-radius: 5px;
   outline: unset;
+  background: rgba(0, 0, 0, 0.06);
+  border: none;
 }
 
 .searchFilter {
@@ -14,11 +19,12 @@
 
 .addStoryBtn {
   width: 100px;
-  height: 50px;
+  height: 45px;
   color: white;
-  background: blue;
+  background: limegreen;
   outline: none;
   border: unset;
+  border-radius: 5px;
   cursor: pointer;
   font-size: 15px;
   font-weight: bold;

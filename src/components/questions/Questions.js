@@ -5,6 +5,12 @@ import { app_onChange, questionListManipulation, onQuestionEdit, onQuestionCance
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import _ from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash, faEdit, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
+
+const sortIconStyle = {
+    color: 'dodgerBlue'
+}
 
 const Questions = (props) => {
     const { state, onChange, questionListManipulation, onQuestionEdit, onQuestionCancel, } = props;
@@ -102,21 +108,38 @@ const Questions = (props) => {
 
     const columns = [
         {
-            Header: 'Question',
+            Header: () => {
+                return (
+                    <div className='columnHeader'>
+                        Question
+                        <FontAwesomeIcon style={sortIconStyle} icon={faSortAmountDown} />
+                    </div>
+                )
+            },
             accessor: 'question',
-            styles: 'height:30px'
+            width: 430
         }, {
-            Header: 'Answer',
+            Header: () => {
+                return (
+                    <div className='columnHeader'>
+                        Answer
+                        <FontAwesomeIcon style={sortIconStyle} icon={faSortAmountDown} />
+                    </div>
+                )
+            },
             accessor: 'answer',
+            width: 430
         }, {
-            Header: 'Actions',
+            Header: '',
             Cell: row => (
-                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <button onClick={() => editQuestion(row.original.id, row.index)}>Edit</button>
-                    <button onClick={() => deleteQuestion(row.original.id)} >Delete</button>
-                    <span></span>
+                <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                    <FontAwesomeIcon style={{ cursor: 'pointer', color: 'grey' }} onClick={() => editQuestion(row.original.id, row.index)} icon={faEdit} />
+                    <FontAwesomeIcon style={{ cursor: 'pointer', color: 'grey' }} onClick={() => deleteQuestion(row.original.id)} icon={faTrash} />
                 </div>
-            )
+            ),
+            resizable: false,
+            width: 100
+
         }];
 
     return (
@@ -153,7 +176,8 @@ const Questions = (props) => {
                         onClick={() => cancelQuestionOperation()}
                     >Cancel</button>
                 </div>
-            </div>{questionsList.length > 0 &&
+            </div>
+            {questionsList.length > 0 &&
                 <ReactTable
                     columns={columns}
                     data={[...questionsList]}
@@ -163,6 +187,7 @@ const Questions = (props) => {
                     noDataText='No Questions'
                 />
             }
+
             {questionsListError && <span style={{ color: 'red' }}>{questionsListError}</span>}
         </div>
     )

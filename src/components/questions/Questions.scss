@@ -33,7 +33,7 @@ $commonBorderColor: #d4d5d6;
   }
 
   input:focus {
-    border: 1px solid blue;
+    border: 1px solid dodgerblue;
   }
 
   .ReactTable .rt-thead.-header {
@@ -46,14 +46,12 @@ $commonBorderColor: #d4d5d6;
     text-align: left;
   }
 
-  .ReactTable .rt-thead .rt-th{
+  .ReactTable .rt-thead .rt-th {
     flex: 100 0 auto;
     width: 100px;
     display: flex;
     align-items: center;
   }
-
-
 }
 
 .questionAndAnswer {
@@ -75,5 +73,10 @@ $commonBorderColor: #d4d5d6;
 }
 
 #addBtn {
-  color: blue;
+  color: dodgerblue;
+}
+
+.columnHeader {
+  display: flex;
+  justify-content: space-between;
 }

@@ -6,7 +6,7 @@ import './Sorter.scss'
 const Sorter = (props) => {
     return (
         <div className={props.className}>
-            <FontAwesomeIcon style={{ color: 'blue' }}  icon={faSortAmountDown} />
+            <FontAwesomeIcon style={{ color: 'dodgerBlue' }}  icon={faSortAmountDown} />
         </div>
     )
 }
