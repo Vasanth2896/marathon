@@ -12,7 +12,7 @@ $commonBorderColor: #d4d5d6;
   margin-bottom: 30px;
 
   input {
-    height: 30px;
+    height: 40px;
   }
 
   input[type="text"],
@@ -28,6 +28,7 @@ $commonBorderColor: #d4d5d6;
 
   button {
     border: unset;
+    color: grey;
     background-color: $commonBorderColor;
     border-radius: $commonBorderRadius;
     outline: none;
@@ -72,12 +73,11 @@ $commonBorderColor: #d4d5d6;
   display: flex;
   align-items: center;
   justify-content: space-around;
-
 }
 
 .storyContent {
   width: 97%;
-  height: 180px;
+  height: 150px;
 }
 
 .keywordContent {
@@ -86,31 +86,29 @@ $commonBorderColor: #d4d5d6;
 }
 
 .chipItem {
-  background-color: #d4d5d6;
+  background-color: #BFB6AA;
   display: inline-block;
   font-size: 14px;
   border-radius: 30px;
   height: 30px;
-  padding: 0 4px 0 1rem;
+  padding: 0 5px 0px 0.5rem;
   display: inline-flex;
   align-items: center;
   margin: 0 0.3rem 0.3rem 0;
 }
 
 .chipItem > .keywordButton {
-  background-color: white;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  outline: none;
-  font: inherit;
-  margin-left: 10px;
-  font-weight: bold;
-  padding: 0;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: grey;
+    color: white;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    margin-left: 10px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

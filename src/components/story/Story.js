@@ -131,12 +131,12 @@ const Story = (props) => {
                         placeholder='keywords'>
                     </input>
                     {keywordList.length > 0 &&
-                        <div style={{ display: 'flex', marginTop: '20px' }}>
+                        <div style={{ marginTop: '20px' }}>
                             {keywordList.map((item, index) => {
                                 return (
                                     <span className='chipItem' key={index}>
                                         {item}
-                                        <button className='keywordButton' onClick={() => handleDelete(item)} > &times;</button>
+                                        <span className='keywordButton' onClick={() => handleDelete(item)} >&times;</span>
                                     </span>
                                 )
                             })

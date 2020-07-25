@@ -5,7 +5,7 @@ import Checkbox from 'react-three-state-checkbox'
 import { headerStyle } from './headerStyles'
 import Pagination from "./pagination/Pagination";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faEdit, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faEdit, faSortAmountDown, faCaretSquareDown } from '@fortawesome/free-solid-svg-icons'
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons'
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -14,20 +14,21 @@ import Sorter from './sorter/Sorter';
 import { connect } from 'react-redux';
 import { app_onChange, mainTableEdit } from '../../store/appActions';
 import { bindActionCreators } from 'redux';
-import _ from "lodash"
+import _, { filter } from "lodash"
 import { useHistory } from 'react-router-dom';
 import RootRef from '@material-ui/core/RootRef';
 
 
 
 const MainStoryTable = (props) => {
-    const { state, onChange, mainTableEdit } = props
+
+    const { state, onChange, mainTableEdit } = props;
     const currentState = _.cloneDeep(state);
     const { storyList } = currentState;
     let newStoryList = _.cloneDeep(storyList);
     const history = useHistory();
     const [storyTableState, setStoryTableState] = useState({
-        filteredData: [],
+        filteredData: newStoryList,
         selectAll: false,
         selectAllIndeterminate: false,
         searchInput: '',
@@ -35,23 +36,37 @@ const MainStoryTable = (props) => {
         storyNameSort: false,
         imageNameSort: false,
         questionCountSort: false,
+        storyContentSort: false,
         storyIdColumnDisplay: true,
         storyNameColumnDisplay: true,
         imageNameColumnDisplay: true,
-        questionCountColumnDisplay: true
-    })
+        questionCountColumnDisplay: true,
+        storyContentColumnDisplay: true
+    });
+
+
 
     const { selectAll, selectAllIndeterminate,
         searchInput, filteredData,
-        storyIdSort, storyNameSort, imageNameSort, questionCountSort,
-        storyIdColumnDisplay, storyNameColumnDisplay, imageNameColumnDisplay, questionCountColumnDisplay } = storyTableState
+        storyIdSort, storyNameSort, imageNameSort, questionCountSort, storyContentSort,
+        storyIdColumnDisplay, storyNameColumnDisplay, imageNameColumnDisplay, questionCountColumnDisplay,
+        storyContentColumnDisplay } = storyTableState;
+
+    let newFilteredData = [];
 
 
     const handleCheckAllChange = (e) => {
         let checked = e.target.checked;
         checked ? newStoryList.map(user => user.select = true) : newStoryList.map(user => user.select = false);
-        setStoryTableState({ ...storyTableState, selectAll: !selectAll, selectAllIndeterminate: false });
         onChange('storyList', newStoryList);
+        setStoryTableState({ ...storyTableState, selectAll: !selectAll, selectAllIndeterminate: false, filteredData: newStoryList });
+
+        if(searchInput){
+            onChange('storyList', newStoryList);
+            checked ? filteredData.map(user => user.select = true) : filteredData.map(user => user.select = false);
+            setStoryTableState({ ...storyTableState, selectAll: !selectAll, selectAllIndeterminate: false, filteredData });
+        }
+
     }
 
     const handleCheckChange = (CheckedUser) => {
@@ -60,45 +75,66 @@ const MainStoryTable = (props) => {
             test.select = !test.select;
         }
 
+        onChange('storyList', newStoryList);
         if (!(newStoryList.every(user => user.select) || newStoryList.every(user => !user.select))) {
-            setStoryTableState({ ...storyTableState, selectAllIndeterminate: true });
+            setStoryTableState({ ...storyTableState, selectAllIndeterminate: true, filteredData: newStoryList });
         } else {
             const selection = newStoryList.every(user => user.select);
-            selection ? setStoryTableState({ ...storyTableState, selectAll: true, selectAllIndeterminate: false }) : setStoryTableState({ ...storyTableState, selectAll: false, selectAllIndeterminate: false });
+            selection ? setStoryTableState({ ...storyTableState, selectAll: true, selectAllIndeterminate: false, filteredData: newStoryList }) : setStoryTableState({ ...storyTableState, selectAll: false, selectAllIndeterminate: false, filteredData: newStoryList });
         }
-        onChange('storyList', newStoryList);
+
+        if(searchInput){
+            const test = filteredData.find(user => user.storyId === CheckedUser.storyId);
+            if (test) {
+                test.select = !test.select;
+            }
+
+            if (!(filteredData.every(user => user.select) || filteredData.every(user => !user.select))) {
+                setStoryTableState({ ...storyTableState, selectAllIndeterminate: true, filteredData: filteredData });
+            } else {
+                const selection = filteredData.every(user => user.select);
+                selection ? setStoryTableState({ ...storyTableState, selectAll: true, selectAllIndeterminate: false, filteredData: filteredData }) : setStoryTableState({ ...storyTableState, selectAll: false, selectAllIndeterminate: false, filteredData: filteredData });
+            }
+            onChange('storyList', newStoryList);
+        }
+
+
     }
 
-    const handleCheckboxes = () => {
-        if (newStoryList.every(user => user.select)) {
-            setStoryTableState({ ...storyTableState, selectAll: true })
-        }
-        else if (!(newStoryList.every(user => user.select) || newStoryList.every(user => !user.select))) {
-            setStoryTableState({ ...storyTableState, selectAllIndeterminate: true, selectAll: !selectAll });
-        }
-    }
 
-    useEffect(() => {
-        let newFilteredData = [];
-        if (searchInput) {
+    const globalSearchFilter = () => {
+        if (searchInput.length) {
             newFilteredData = newStoryList.filter(value => {
                 return (
                     value.storyName.toLowerCase().includes(searchInput.toLowerCase()) ||
-                    value.imageName.toLowerCase().includes(searchInput.toLowerCase())
+                    value.imageName.toLowerCase().includes(searchInput.toLowerCase()) ||
+                    value.storyContent.toLowerCase().includes(searchInput.toLowerCase())
                 );
-
             });
+            if (newFilteredData.length) {
+                setStoryTableState({ ...storyTableState, filteredData: newFilteredData })
+            }
+            else if (!newFilteredData.length) {
+                setStoryTableState({ ...storyTableState, filteredData: [] });
+            }
         }
-        handleCheckboxes();
-        setStoryTableState({ ...storyTableState, filteredData: newFilteredData });
-    }, [searchInput, selectAll]);
+
+    }
 
     useEffect(() => {
-        handleCheckboxes();
-    }, [selectAll]);
+        if (searchInput) {
+            globalSearchFilter();
+            console.log(searchInput,filteredData);
+        }
+        else {
+            setStoryTableState({ ...storyTableState, filteredData: newStoryList });
+        }
+
+    }, [searchInput]);
+
 
     const handleSearchInputChange = (e) => {
-        setStoryTableState({ ...storyTableState, searchInput: e.target.value })
+        setStoryTableState({ ...storyTableState, searchInput: e.target.value });
     }
 
     const handleSortChangeStyle = (props) => {
@@ -109,18 +145,17 @@ const MainStoryTable = (props) => {
         }
     }
 
-    const fileInputRef = useRef();
+    const handleDeleteData = (value) => {
+        const deleteStory = newStoryList.filter(story => JSON.stringify(story) !== JSON.stringify(value));
+        deleteStory.map(story => Object.assign(story, { storyId: deleteStory.indexOf(story) + 1 }));
+        onChange('storyList', deleteStory);
+        setStoryTableState({ ...storyTableState, filteredData: deleteStory, selectAll: deleteStory.every(user => user.select), selectAllIndeterminate: false, searchInput: '' });
 
-    const handleDeleteData = (index) => {
-        console.log(index);
-        // newStoryList.splice(index, 1);
-        // onChange('storyList', newStoryList);
     }
 
     const handleEditData = (value, index) => {
-        console.log(value, index);
-        // mainTableEdit(value, index);
-        // history.push('/storyform');
+        mainTableEdit(value, index);
+        history.push('/storyform');
     }
 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -140,18 +175,18 @@ const MainStoryTable = (props) => {
 
     const columns = [
         {
-            headerStyle: { outline:'none', pointerEvents: 'none',borderRight:'unset' },
+            headerStyle: { outline: 'none', pointerEvents: 'none', borderRight: 'unset' },
             Header: (
                 <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }} >
                     <Checkbox
                         style={{ pointerEvents: 'auto' }}
                         indeterminate={selectAllIndeterminate}
-                        checked={selectAll || ''}
+                        checked={selectAll}
                         className='checkBoxes'
                         onChange={(e) => handleCheckAllChange(e)}
                     ></Checkbox>
-                    <div style={{ pointerEvents: 'auto',cursor:'pointer' }}>
-                        <FontAwesomeIcon style={{ color: 'dodgerBlue' }} icon={faSortAmountDown} onClick={handleClick}/>
+                    <div style={{ pointerEvents: 'auto', cursor: 'pointer' }}>
+                        <FontAwesomeIcon style={{ color: 'dodgerBlue' }} icon={faCaretSquareDown} onClick={handleClick} />
                         <Menu
                             id="simple-menu"
                             anchorEl={anchorEl}
@@ -170,6 +205,10 @@ const MainStoryTable = (props) => {
                             <MenuItem >
                                 <input name='imageNameColumnDisplay' checked={imageNameColumnDisplay} onChange={handleColumnDisplayChange} type='checkbox' style={{ cursor: 'pointer' }} />
                                 Image Name
+                                </MenuItem>
+                            <MenuItem >
+                                <input name='storyContentColumnDisplay' checked={storyContentColumnDisplay} onChange={handleColumnDisplayChange} type='checkbox' style={{ cursor: 'pointer' }} />
+                                story Content
                                 </MenuItem>
                             <MenuItem >
                                 <input name='questionCountColumnDisplay' checked={questionCountColumnDisplay} onChange={handleColumnDisplayChange} type='checkbox' style={{ cursor: 'pointer' }} />
@@ -203,7 +242,7 @@ const MainStoryTable = (props) => {
                 </div >
             ),
             accessor: 'storyId',
-            width: 200,
+            width: 120,
             show: storyIdColumnDisplay
         }, {
 
@@ -214,7 +253,7 @@ const MainStoryTable = (props) => {
                     <Sorter className={storyNameSort ? 'sortIconDown' : 'sortIconUp'} />
                 </div>),
             accessor: 'storyName',
-            width: 250,
+            width: 280,
             show: storyNameColumnDisplay
         }, {
             headerStyle: headerStyle,
@@ -226,8 +265,19 @@ const MainStoryTable = (props) => {
             accessor: 'imageName',
             width: 250,
             show: imageNameColumnDisplay
-        }, {
-
+        },
+        {
+            headerStyle: headerStyle,
+            Header: (
+                <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }}>
+                    storyContent
+                    <Sorter className={storyContentSort ? 'sortIconDown' : 'sortIconUp'} />
+                </div>),
+            accessor: 'storyContent',
+            width: 320,
+            show: storyContentColumnDisplay
+        },
+        {
             headerStyle: headerStyle,
             Header: (
                 <div style={{ pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }}>
@@ -235,7 +285,7 @@ const MainStoryTable = (props) => {
                     <Sorter className={questionCountSort ? 'sortIconDown' : 'sortIconUp'} />
                 </div>),
             accessor: 'questionCount',
-            width: 250,
+            width: 270,
             show: questionCountColumnDisplay
         },
         {
@@ -244,14 +294,16 @@ const MainStoryTable = (props) => {
             accessor: '',
             Cell: ({ value, index }) => {
                 return (
-                    <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                        <FontAwesomeIcon style={{ color: 'blue', cursor: 'pointer' }} icon={faTrash} onClick={() => handleDeleteData(index)} />
-                        <FontAwesomeIcon style={{ color: 'blue', cursor: 'pointer' }} icon={faEdit} onClick={() => handleEditData(value, index)} />
+                    <div style={{ display: 'flex', justifyContent: 'space-evenly', width: '100px' }}>
+
+                        <FontAwesomeIcon style={{ color: 'dodgerblue', cursor: 'pointer' }} icon={faTrash} onClick={() => handleDeleteData(value)} />
+                        <FontAwesomeIcon style={{ color: 'dodgerblue', cursor: 'pointer' }} icon={faEdit} onClick={() => handleEditData(value, index)} />
                     </div>
                 );
             },
             width: 'auto',
             resizable: false,
+            sortable: false
         }
     ];
 
@@ -261,19 +313,19 @@ const MainStoryTable = (props) => {
                 <h2>Story Details</h2>
                 <SearchFilter searchInputValue={searchInput} searchInputChange={handleSearchInputChange} />
             </div>
-            {storyList.length > 0 &&
+            {!filteredData.length || !storyList.length ? <div><h1>There is no story</h1></div> :
                 <div>
                     <ReactTable
                         PaginationComponent={Pagination}
                         columns={columns}
-                        data={filteredData.length > 0 ? filteredData : newStoryList}
+                        data={filteredData}
                         className="-striped -highlight"
                         minRows={0}
                         onSortedChange={(props) => handleSortChangeStyle(props)}
-                        style={{boxShadow: 'unset'}}
                     />
                 </div>
             }
+
         </div>
     )
 }

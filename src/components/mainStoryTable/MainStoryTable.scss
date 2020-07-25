@@ -12,11 +12,19 @@
 }
 
 .ReactTable {
-  // .rt-thead.-header {
-  //   height: 50px;
-  //   background: rgba(128, 128, 128, 0.25);
-  //   box-shadow: none;
-  // }
+  .rt-thead .rt-th.-sort-asc,.rt-thead .rt-td.-sort-asc {
+    box-shadow: none !important;
+  }
+
+  .rt-thead .rt-th.-sort-desc, .ReactTable .rt-thead .rt-td.-sort-desc {
+    box-shadow: none !important;
+}
+
+  .rt-thead.-header {
+    height: 50px;
+    background: rgba(128, 128, 128, 0.25);
+    box-shadow: none !important;
+  }
 
   .rt-th.rt-resizable-header.-cursor-pointer {
     pointer-events: none;
@@ -59,12 +67,6 @@
 .ReactTable .rt-tbody .rt-tr-group {
   height: 50px;
   text-align: left;
-}
-
-.ReactTable .rt-thead.-header {
-  box-shadow: inset 0 0px 0 0 rgba(0, 0, 0, 0.6);
-  height: 50px;
-  background: rgba(128, 128, 128, 0.25);
 }
 
 .innerDiv {

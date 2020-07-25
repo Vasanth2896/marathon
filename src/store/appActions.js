@@ -12,7 +12,7 @@ export const initialState = {
         storyNameError: '',
         storyContentError: '',
         keywordListError: '',
-        // bannerImageError: ''
+        bannerImageError: ''
     },
     questionSet: {
         question: '',
@@ -25,38 +25,56 @@ export const initialState = {
     storyList: [
         {
             storyId: 1,
-            imageName: "dummyImage",
+            imageName: "Red riding hood",
             keywordList: [
-                "1"
+                "hood"
             ],
             questionCount: 1,
             questionSet: [
                 {
                     id: 1,
-                    question: 1,
-                    answer: 1
+                    question: 'who was red riding hood?',
+                    answer: 'she was a little girl'
                 }
             ],
-            storyName: '1',
-            storyContent: '1',
+            storyName: 'red riding hood',
+            storyContent: 'red riding hood and the wolf',
             select: false
         },
         {
             storyId: 2,
-            imageName: "dummyImage",
+            imageName: "Three Little Pigs",
             keywordList: [
-                "2"
+                "pigs"
             ],
             questionCount: 1,
             questionSet: [
                 {
                     id: 1,
-                    question: "2",
-                    answer: "2",
+                    question: "How Many pigs are present",
+                    answer: "3",
                 }
             ],
-            storyName: '2',
-            storyContent: "2",
+            storyName: 'Three little pigs',
+            storyContent: "story about pigs",
+            select: false
+        },
+        {
+            storyId: 3,
+            imageName: "Beauty and the beast",
+            keywordList: [
+                "prince"
+            ],
+            questionCount: 1,
+            questionSet: [
+                {
+                    id: 1,
+                    question: "Did the beast become a prince?",
+                    answer: "yes",
+                }
+            ],
+            storyName: 'Beauty and the beast',
+            storyContent: "It is about a beautiful Lady",
             select: false
         }
     ],

@@ -31,6 +31,8 @@ const Questions = (props) => {
     const { error, editableIndex } = questionState
     const { questionError, answerError } = error;
     const pointerEvents = editableIndex !== null ? 'none' : 'auto';
+    const pointerEventCursor =  editableIndex !== null ? 'not-allowed':'default' ;
+
 
     let newQuestionsList = [...questionsList];
 
@@ -47,8 +49,8 @@ const Questions = (props) => {
 
     const addQuestions = () => {
         if (question && answer) {
-            const questionEmptySpace = question.replace(/\s/g, '');
-            const answerEmptySpace = answer.replace(/\s/g, '');
+            const questionEmptySpace = question.toString().replace(/\s/g, '');
+            const answerEmptySpace = answer.toString().replace(/\s/g, '');
             if (questionEmptySpace.length <= 0 && answerEmptySpace.length <= 0) {
                 setQuestionState({ ...questionState, error: { ...error, questionError: 'Please enter the question', answerError: 'Please enter the answer' } });
             }
@@ -138,12 +140,14 @@ const Questions = (props) => {
                 </div>
             ),
             resizable: false,
-            width: 100
+            width: 100,
+            sortable:false
 
         }];
 
     return (
         <div className='questionContainer'>
+            <h3>Questionnaire</h3>
             <div className='questionAndAnswer'>
                 <div>
                     <input
@@ -178,14 +182,17 @@ const Questions = (props) => {
                 </div>
             </div>
             {questionsList.length > 0 &&
-                <ReactTable
-                    columns={columns}
-                    data={[...questionsList]}
-                    showPagination={false}
-                    style={{ height: '250px', backgroundColor: 'white', pointerEvents: pointerEvents }}
-                    className="-striped -highlight"
-                    noDataText='No Questions'
-                />
+                <div style={{cursor:pointerEventCursor}} >
+                    <ReactTable
+                        columns={columns}
+                        data={[...questionsList]}
+                        minRows={0}
+                        showPagination={false}
+                        style={{ backgroundColor: 'white',pointerEvents:pointerEvents }}
+                        className="-striped -highlight"
+                        noDataText='No Questions'
+                    />
+                </div>
             }
 
             {questionsListError && <span style={{ color: 'red' }}>{questionsListError}</span>}
